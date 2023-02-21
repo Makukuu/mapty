@@ -5,6 +5,8 @@ class Workout {
   // every object should have some form of a unique id so we can find it later ( we usually use some library for this)
   id = (Date.now() + "").slice(-10);
 
+  // just to make a Public API (exercise)
+  clicks = 0;
   constructor(coords, distance, duration) {
     this.coords = coords; // [lat, lng]
     this.distance = distance; // in km
@@ -18,6 +20,10 @@ class Workout {
     this.description = `${this.type[0].toUpperCase()}${this.type.slice(1)} on ${
       months[this.date.getMonth()]
     } ${this.date.getDate()}`;
+  }
+
+  click() {
+    this.clicks++;
   }
 }
 
@@ -72,6 +78,7 @@ class App {
   #map;
   #mapEvent;
   #workouts = [];
+  #mapZoomLevel = 13;
 
   constructor() {
     this._getPosition();
@@ -82,6 +89,9 @@ class App {
 
     // changing form options for different workout types (running vs cycling)
     inputType.addEventListener("change", this._toggleElevationField);
+
+    // event delegation: move view to marker
+    containerWorkouts.addEventListener("click", this._moveToPopup.bind(this));
   }
 
   _getPosition() {
@@ -109,7 +119,7 @@ class App {
 
     // the "map" in parenthessis corresponds to an id tag in our html, that's where the map will be displayed
     // 2nd argument of setView is the zoom level
-    this.#map = L.map("map").setView(coords, 13);
+    this.#map = L.map("map").setView(coords, this.#mapZoomLevel);
 
     //we can set different styles of openstreetmap
     L.tileLayer("https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png", {
@@ -125,6 +135,7 @@ class App {
   _showForm(mapE) {
     // copying to a global variable because we need it at form submit event
     this.#mapEvent = mapE;
+    // transition form into view
     form.classList.toggle("hidden");
     form.classList.toggle("form--transition");
     // good for user experience, we can immediately start typing
@@ -133,6 +144,7 @@ class App {
 
   _hideForm() {
     inputDistance.value = inputDuration.value = inputElevation.value = "";
+    // remove form from view immediately
     form.classList.toggle("hidden");
     form.classList.toggle("form--transition");
   }
@@ -264,6 +276,28 @@ class App {
     `;
 
     form.insertAdjacentHTML("afterend", html);
+  }
+
+  _moveToPopup(e) {
+    const workoutEl = e.target.closest(".workout");
+
+    if (!workoutEl) return;
+
+    // workout id is used to build a bridge between our data and user UI
+    const workout = this.#workouts.find(
+      (work) => work.id === workoutEl.dataset.id
+    );
+
+    this.#map.setView(workout.coords, this.#mapZoomLevel, {
+      animate: true,
+      pan: {
+        duration: 1,
+      },
+    });
+
+    // using the public interface
+    workout.click();
+    console.log(workout);
   }
 }
 

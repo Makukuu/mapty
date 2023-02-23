@@ -1,6 +1,8 @@
 This is a follow along project from the course:
 https://www.udemy.com/course/the-complete-javascript-course/
 
+Live site version: https://makukuu.github.io/mapty/
+
 Detailed notes were made in the form of comments for future reference.
 
 Through this project the following subjects were covered and learned:

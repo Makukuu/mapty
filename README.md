@@ -7,6 +7,7 @@ Mapping is done by using geolocation API and Leaflet library.
 
 Detailed notes were made in the form of comments for future reference.
 
-[Live preview](https://makukuu.github.io/mapty/)
+Live preview: https://makukuu.github.io/mapty/
+
 
 
